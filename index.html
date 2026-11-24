@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Leaflet CSS Link -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+    <title>Web-GIS Kabupaten Sleman</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <!-- Leaflet JS Link -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <!-- jQuery Link -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Leaflet Geoserver Request Link -->
+    <script src="lib/L.Geoserver.js"></script>
+
+    <script>
+        // 1. Inisialisasi Peta berpusat di Kabupaten Sleman
+        var map = L.map("map").setView([-7.71858, 110.3556], 11);
+
+        // 2. Basemap OpenStreetMap
+        var osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution:
+                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        });
+        osm.addTo(map);
+
+        // 3. Layer WMS Batas Administrasi Kabupaten Sleman
+        var wmsAdministrasi = L.Geoserver.wms("http://localhost:8080/geoserver/pgweb/wms", {
+            layers: "pgweb:administrasi_ar_5k1_th_2023",
+            transparent: true,
+            attribution: "Administrasi Kabupaten Sleman",
+        });
+        wmsAdministrasi.addTo(map);
+
+        // 4. Layer WMS Jaringan Jalan Kabupaten Sleman
+        var wmsJalan = L.Geoserver.wms("http://localhost:8080/geoserver/pgweb/wms", {
+            layers: "pgweb:jalan_ln",
+            transparent: true,
+            attribution: "Jaringan Jalan Kabupaten Sleman",
+        });
+        wmsJalan.addTo(map);
+
+        // 5. Layer WMS Titik Kabupaten Sleman
+        var wmsTitik = L.Geoserver.wms("http://localhost:8080/geoserver/pgweb/wms", {
+            layers: "pgweb:titik_sleman",
+            transparent: true,
+            attribution: "Titik Kabupaten Sleman",
+        });
+        wmsTitik.addTo(map);
+
+        // 6. Kontrol Layer (Layer Control) di pojok kanan atas
+        var baseMaps = {
+            "OpenStreetMap": osm
+        };
+
+        var overlayMaps = {
+            "Batas Administrasi": wmsAdministrasi,
+            "Jaringan Jalan": wmsJalan,
+            "Titik Sleman": wmsTitik
+        };
+
+        L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
+
+        // 7. Legenda WMS untuk Batas Administrasi
+        var legendAdministrasi = L.Geoserver.legend("http://localhost:8080/geoserver/pgweb/wms", {
+            layers: "pgweb:administrasi_ar_5k1_th_2023",
+        });
+        legendAdministrasi.addTo(map);
+
+        // 8. Legenda WMS untuk Jaringan Jalan
+        var legendJalan = L.Geoserver.legend("http://localhost:8080/geoserver/pgweb/wms", {
+            layers: "pgweb:jalan_ln",
+        });
+        legendJalan.addTo(map);
+
+        // 9. Legenda WMS untuk Titik Sleman
+        var legendTitik = L.Geoserver.legend("http://localhost:8080/geoserver/pgweb/wms", {
+            layers: "pgweb:titik_sleman",
+        });
+        legendTitik.addTo(map);
+    </script>
+</body>
+
+</html>
